@@ -1,0 +1,767 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Congress API</title>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
+<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.2.0.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<script>
+	/*Menu-toggle*/
+	$(document).ready(function() {
+		$("#selectChangable").val("All States");
+	    $("#menu-toggle").click(function() {
+			if($("#RightPage").attr("class")=="col-xs-10")
+			{
+			$("#Sidebar").css("display","none");
+			$("#RightPage").attr("class","col-xs-12");
+			}
+			else
+			{
+			$("#Sidebar").css("display","inherit");
+			$("#RightPage").attr("class","col-xs-10");
+			}
+    });
+		$("#btn01").click(function(){
+			$('#myCarousel').carousel("prev");
+			});
+	
+});
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<link href="MyCSS.css" rel="stylesheet" type="text/css">
+<script src="script01.js"></script>
+</head>
+
+<body>
+<div ng-controller="MyController" class="my-controller"> 
+  <!--<div class="navbar navbar-inverse navbar-fixed-top" style="background-color:white;padding:1em"> <a style="color:black" id="menu-toggle" href="#"><i class="fa fa-bars fa-2x" aria-hidden="false"></i></a>
+      <span style="margin-left:45%"><img src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/sunlight.png"></span>
+    </div>-->
+  
+  <div class="container-fluid">
+    <div class="row" style="margin:1em">
+      <div class="col-xs-1"> <a style="color:black" id="menu-toggle" href="javascript:void(0)" onClick="hideSidebar()"><i class="fa fa-bars fa-2x" aria-hidden="false"></i></a> </div>
+      <div class="col-xs-11"> <span style="margin-left:45%"><img src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/sunlight.png"></span> </div>
+    </div>
+    <div class="row" style="height:100%"> 
+      <!-- Sidebar -->
+      <div id="Sidebar" class="col-xs-2" style="color:white;height:100%;min-height:900px;background-color:black;margin:0px">
+        <ul class="sidebar-nav nav">
+          <li class="sidebar-brand"><a href="javascript:void(0)" onClick="jump('Legislators')"><span class="glyphicon glyphicon-user"></span> <span class="hidden-xs">Legislators</span></a></li>
+          <li class="sidebar-brand"> <a href="javascript:void(0)" onClick="jump('Bills')"><span class="glyphicon glyphicon-file"></span><span class="hidden-xs"> Bills</span></a> </li>
+          <li class="sidebar-brand"> <a href="javascript:void(0)" onClick="jump('Committees')"><span class="glyphicon glyphicon-log-in"></span> <span class="hidden-xs">Committees</span></a> </li>
+          <li class="sidebar-brand"> <a href="javascript:void(0)" onClick="jump('Favorites')"><span class="glyphicon glyphicon-star"></span> <span class="hidden-xs">Favorites</span></a> </li>
+        </ul>
+      </div>
+      <div id="RightPage" class="col-xs-10" style="height:100%;margin:0px;padding: 0"> 
+        <!-- Page content -->
+        <div class="PageContent" style="height:100%">
+          <div id="Legislators" class="MyBlock">
+            <div class="page-content">
+              <div class="container-fluid">
+                <h2>Legislator</h2>
+                <hr width=100% style="border-color:black">
+                <div id="myCarouselLegislators" class="carousel slide" data-interval="false"> 
+                  <!-- Wrapper for slides -->
+                  <div id="LegislatorShow" class="carousel-inner" role="listbox" style="box-shadow:0 0 3px #000;background-color:white;">
+                    <div class="item active">
+                      <ul class="nav nav-tabs">
+                        <li role="presentation"><a href="javascript:void(0)" onClick="showLegislators('ByState')">By State</a></li>
+                        <li role="presentation"><a href="javascript:void(0)" onClick="showLegislators('House')">House</a></li>
+                        <li role="presentation"><a href="javascript:void(0)" onClick="showLegislators('Senate')">Senate</a></li>
+                      </ul>
+                      <div class="LegislatorsByState">
+                        <div class="panel panel-default PanelNav">
+                          <div class="panel-heading">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-xs-9">Legislators By State</div>
+                                <div class="col-xs-3" id="divChangable">
+                                  <select id ="selectChangable" name="stateName" ng-change="selectState()" ng-model="stateNameValue">
+                                    <option ng-repeat="x in stateList" value="{{x}}">{{x}}</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table">
+                              <tr>
+                                <th>Party</th>
+                                <th>Name</th>
+                                <th>Chamber</th>
+                                <th>District</th>
+                                <th>State</th>
+                              </tr>
+                              <tr dir-paginate="x in myByStateData | orderBy:['state_name','last_name'] | filter: FilterState | itemsPerPage: pageSize" pagination-id="LegislatorsByState">
+                                <td ng-if="x.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png"></td>
+                                <td ng-if="x.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png"></td>
+                                <td>{{x.first_name}},{{x.last_name}}</td>
+                                <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                <td ng-if="!x.district">N.A.</td>
+                                <td ng-if="x.district">{{x.district}}</td>
+                                <td>{{x.state_name}}</td>
+                                <td><button type="button" class="btn btn-primary"  href="#myCarouselLegislators" data-slide="next" ng-click="passValue(x,'Legislators')">View Details</button></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                        <div style="text-align:center">
+                          <dir-pagination-controls pagination-id="LegislatorsByState" boundary-links="true"></dir-pagination-controls>
+                        </div>
+                      </div>
+                      <div class="LegislatorsHouse" style="display:none">
+                        <div class="panel panel-default PanelNav">
+                          <div class="panel-heading">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-xs-9">Legislators By House</div>
+                                <div class="col-xs-3">
+                                  <input id ="textChangable" ng-model="w" type="text" placeholder="Search">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table" width="40%" style="margin:auto">
+                              <tr>
+                                <th>Party</th>
+                                <th>Name</th>
+                                <th>Chamber</th>
+                                <th>District</th>
+                                <th>State</th>
+                              </tr>
+                              <tr dir-paginate="x in myHouseData | orderBy:['last_name'] | filter:w | itemsPerPage: pageSize" pagination-id="LegislatorsHouse">
+                                <td ng-if="x.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png"></td>
+                                <td ng-if="x.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png"></td>
+                                <td>{{x.first_name}},{{x.last_name}}</td>
+                                <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                <td ng-if="!x.district">N.A.</td>
+                                <td ng-if="x.district">{{x.district}}</td>
+                                <td>{{x.state_name}}</td>
+                                <td><button type="button" class="btn btn-primary"  href="#myCarouselLegislators" data-slide="next" ng-click="passValue(x,'Legislators')">View Details</button></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                        <div style="text-align:center">
+                          <dir-pagination-controls pagination-id="LegislatorsHouse" boundary-links="true"></dir-pagination-controls>
+                        </div>
+                      </div>
+                      <div class="LegislatorsSenate" style="display:none">
+                        <div class="panel panel-default PanelNav">
+                          <div class="panel-heading">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-xs-9">Legislators By Senate</div>
+                                <div class="col-xs-3">
+                                  <input ng-model="z" type="text" placeholder="Search">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table" width="40%" style="margin:auto">
+                              <tr>
+                                <th>Party</th>
+                                <th>Name</th>
+                                <th>Chamber</th>
+                                <th>District</th>
+                                <th>State</th>
+                              </tr>
+                              <tr dir-paginate="x in mySenateData | orderBy:['last_name'] | filter:z | itemsPerPage: pageSize" pagination-id="LegislatorsSenate">
+                                <td ng-if="x.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png"></td>
+                                <td ng-if="x.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png"></td>
+                                <td>{{x.first_name}},{{x.last_name}}</td>
+                                <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                <td ng-if="!x.district">N.A.</td>
+                                <td ng-if="x.district">{{x.district}}</td>
+                                <td>{{x.state_name}}</td>
+                                <td><button type="button" class="btn btn-primary"  href="#myCarouselLegislators" data-slide="next" ng-click="passValue(x,'Legislators')">View Details</button></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                        <div style="text-align:center">
+                          <dir-pagination-controls pagination-id="LegislatorsSenate" boundary-links="true"></dir-pagination-controls>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="item" style="background-color:white">
+                      <div id="detail" class="panel panel-default">
+                        <div class="panel-heading">
+                          <button href="#myCarouselLegislators" data-slide="prev" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Details</button>
+                          <button ng-click="addToFavorite('Legislators')" class="btn btn-default" aria-label="Right Align" style="margin-left:89%"><span ng-class="starType(tempLegislators,'Legislators')" ng-style="colorSelect(tempLegislators,'Legislators')" aria-hidden="true"></span></button>
+                        </div>
+                        <div class="container-fluid">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="table-responsive">
+                                <table class="table">
+                                  <tr>
+                                    <td rowspan="6"><img src="http://theunitedstates.io/images/congress/225x275/{{tempLegislators.bioguide_id}}.jpg"></td>
+                                  </tr>
+                                  <tr>
+                                    <td>{{tempLegislators.title}},{{tempLegislators.first_name}},{{tempLegislators.last_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><a href="mailto:{{tempLegislators.oc_email}}">{{tempLegislators.oc_email}}</a></td>
+                                  </tr>
+                                  <tr>
+                                    <td>Chamber:{{tempLegislators.chamber}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Contact:{{tempLegislators.phone}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td ng-if="tempLegislators.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png">Democrat </td>
+                                    <td ng-if="tempLegislators.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png">Republican </td>
+                                  </tr>
+                                  <tr>
+                                    <td>Start Term:</td>
+                                    <td>{{outputLegislatorsterm_start}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>End Term:</td>
+                                    <td>{{outputLegislatorsterm_end}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Term:</td>
+                                    <td><uib-progressbar value="percentage" type="success">{{percentage}}%</uib-progressbar></td>
+                                  </tr>
+                                  <tr>
+                                    <td>Office:</td>
+                                    <td>{{tempLegislators.office}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Fax:</td>
+                                    <td>{{tempLegislators.fax}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Birthday:</td>
+                                    <td>{{tempLegislators.birthday}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Social Links</td>
+                                    <td><a href="http://twitter.com/{{tempLegislators.twitter_id}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/twitter.png"></a><a href="http://facebook.com/{{tempLegislators.facebook_id}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/facebook.png"></a><a href="{{tempLegislators.website}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/website.png"></a></td>
+                                  </tr>
+                                </table>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <h2>Committees</h2>
+                              <div class="table-responsive">
+                                <table class="table">
+                                  <tr>
+                                    <th>Chamber</th>
+                                    <th>Committee ID</th>
+                                    <th>Name</th>
+                                  </tr>
+                                  <tr ng-repeat="x in myRelativeCommittees | limitTo:5">
+                                    <td>{{x.chamber}}</td>
+                                    <td>{{x.committee_id}}</td>
+                                    <td>{{x.name}}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                              <h2>Bills</h2>
+                              <div class="table-responsive">
+                                <table class="table">
+                                  <tr ng-repeat="x in myRelativeBills | limitTo:5">
+                                    <td>{{x.bill_id}}</td>
+                                    <td>{{x.short_title}}</td>
+                                    <td>{{x.chamber}}</td>
+                                    <td>{{x.bill_type}}</td>
+                                    <td>{{x.congress}}</td>
+                                    <td><a href="{{x.last_version.urls.pdf}}">Link</a></td>
+                                  </tr>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="Bills" class="MyBlock" style="display:none">
+            <div class="page-content">
+              <div class="container-fluid">
+                <h2>Bills</h2>
+                <hr width=100% style="border-color:black">
+                <div id="myCarouselBills" class="carousel slide" data-interval="false">
+                  <div class="carousel-inner" role="listbox" style="box-shadow:0 0 3px #000;background-color:white;">
+                    <div class="item active">
+                      <ul class="nav nav-tabs">
+                        <li role="presentation"><a href="javascript:void(0)" onClick="showBills('Active')">Active Bills</a></li>
+                        <li role="presentation"><a href="javascript:void(0)" onClick="showBills('New')">New Bills</a></li>
+                      </ul>
+                      <div class="ActiveBills">
+                        <div class="panel panel-default PanelNav">
+                          <div class="panel-heading">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-xs-9"> Active Bills </div>
+                                <div class="col-xs-3">
+                                  <input ng-model="FilterActiveBill" type="text" placeholder="Search">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table">
+                              
+                                <th>Bill ID</th>
+                                <th>Bill Type</th>
+                                <th>Title</th>
+                                <th>Chamber</th>
+                                <th>Introduced On</th>
+                                <th>Sponsor</th>
+                              <tr dir-paginate="x in myActiveBills | filter:FilterActiveBill | orderBy:x.introduced_on | itemsPerPage: pageSize" current-page="currentPage" pagination-id="ActiveBills">
+                                <td class="text-uppercase">{{x.bill_id}}</td>
+                                <td class="text-uppercase">{{x.bill_type}}</td>
+                                <td>{{x.official_title}}</td>
+                                <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                <td>{{x.introduced_on}}</td>
+                                <td>{{x.sponsor.title}},{{x.sponsor.first_name}},{{x.sponsor.last_name}}</td>
+                                <td><button type="button" class="btn btn-primary"  href="#myCarouselBills" data-slide="next" ng-click="passValue(x,'Bills')">View Details</button></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                        <div style="text-align:center">
+                          <dir-pagination-controls pagination-id="ActiveBills" boundary-links="true"></dir-pagination-controls>
+                        </div>
+                      </div>
+                      <div class="NewBills" style="display:none">
+                        <div class="panel panel-default PanelNav">
+                          <div class="panel-heading">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-xs-9"> New Bills </div>
+                                <div class="col-xs-3">
+                                  <input ng-model="FilterNewBill" type="text" placeholder="Search">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table">
+                              
+                                <th>Bill ID</th>
+                                <th>Bill Type</th>
+                                <th>Title</th>
+                                <th>Chamber</th>
+                                <th>Introduced On</th>
+                                <th>Sponsor</th>
+                              <tr dir-paginate="x in myNewBills | orderBy:x.introduced_on | filter:FilterNewBill | itemsPerPage: pageSize" current-page="currentPage" pagination-id="newBills">
+                                <td class="text-uppercase">{{x.bill_id}}</td>
+                                <td class="text-uppercase">{{x.bill_type}}</td>
+                                <td>{{x.official_title}}</td>
+                                <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                <td>{{x.introduced_on}}</td>
+                                <td>{{x.sponsor.title}},{{x.sponsor.first_name}},{{x.sponsor.last_name}}</td>
+                                <td><button type="button" class="btn btn-primary"  href="#myCarouselBills" data-slide="next" ng-click="passValue(x,'Bills')">View Details</button></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                        <div style="text-align:center">
+                          <dir-pagination-controls pagination-id="newBills" boundary-links="true"></dir-pagination-controls>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="item" style="background-color:white">
+                      <div class="panel-heading">
+                        <button href="#myCarouselBills" data-slide="prev" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Details</button>
+                        <button ng-click="addToFavorite('Bills')" class="btn btn-default" aria-label="Right Align" style="margin-left:89%"><span ng-class="starType(tempBills,'Bills')" ng-style="colorSelect(tempBills,'Bills')" aria-hidden="true"></span></button>
+                        <div class="container">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="table-responsive">
+                                <table class="table">
+                                  <tr>
+                                    <td><b>Bill ID</b></td>
+                                    <td>{{tempBills.bill_id}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Title</b></td>
+                                    <td>{{tempBills.official_title}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Bill Type</b></td>
+                                    <td>{{tempBills.bill_type}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Sponsor</b></td>
+                                    <td>{{tempBills.sponsor.title}}. {{tempBills.sponsor.first_name}}, {{tempBills.sponsor.last_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Chamber</b></td>
+                                    <td>{{tempBills.chamber}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Status</b></td>
+                                    <td ng-if="tempBills.active">Active</td>
+                                    <td ng-if="!(tempBills.active)">New</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Introduced On</b></td>
+                                    <td>{{tempBills.introduced_on}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Congress URL</b></td>
+                                    <td><a href="{{tempBills.urls.congress}}">URL</a></td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Version Status</b></td>
+                                    <td>{{tempBills.last_version.version_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Bill URL</b></td>
+                                    <td><a href="{{tempBills.last_version.urls.pdf}}">Link</a></td>
+                                  </tr>
+                                </table>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <object height="500px" width="100%" data="{{tempBills.last_version.urls.pdf}}">
+                              </object>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="Committees" class="MyBlock" style="height:100%;display:none">
+            <div class="page-content">
+              <div class="container-fluid">
+                <h2>Committees</h2>
+                <hr width=100% style="border-color:black">
+                <div  style="box-shadow:0 0 3px #000;background-color:white;">
+                  <ul class="nav nav-tabs">
+                    <li role="presentation"><a href="javascript:void(0)" ng-click="filter('House')">House</a></li>
+                    <li role="presentation"><a href="javascript:void(0)" ng-click="filter('Senate')">Senate</a></li>
+                    <li role="presentation"><a href="javascript:void(0)" ng-click="filter('Joint')">Joint</a></li>
+                  </ul>
+                  <div class="panel panel-default PanelNav">
+                    <div class="panel-heading">
+                    <div class="container-fluid">
+                    <div class="row">
+                    <div id="CommitteesSpan" class="col-xs-9">House</div>
+                    <div class="col-xs-3">
+                      <input id="CommitteesSearch" ng-model="h" type="text" placeholder="Search">
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                    <div class="table-responsive">
+                      <table class="table">
+                        <tr>
+                          <th></th>
+                          <th>Chamber</th>
+                          <th>Committee ID</th>
+                          <th>Name</th>
+                          <th>Parent Committee</th>
+                          <th>Contact</th>
+                          <th>Office</th>
+                        </tr>
+                        <tr dir-paginate="x in myCommitteesData | filter:Filter | filter:h | orderBy : x.committee_id | itemsPerPage: 10" pagination-id="Committees">
+                          <td><button ng-click="addToFavorite('Committees',x)" class="btn btn-default" aria-label="Right Align"><span ng-class="starType(x,'Committees')" ng-style="colorSelect(x,'Committees')" aria-hidden="true"></span></button></td>
+                          <td ng-if="x.chamber=='house'"><img style="width:5em;height:5em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                          <td ng-if="x.chamber=='senate'"><img style="width:5em;height:5em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                          <td>{{x.committee_id}}</td>
+                          <td ng-if="!x.name">N.A.</td>
+                          <td ng-if="x.name">{{x.name}}</td>
+                          <td ng-if="!x.parent_committee_id">N.A.</td>
+                          <td ng-if="x.parent_committee_id">{{x.parent_committee_id}}</td>
+                          <td ng-if="!x.phone">N.A.</td>
+                          <td ng-if="x.phone">{{x.phone}}</td>
+                          <td ng-if="!x.office">N.A.</td>
+                          <td ng-if="x.office">{{x.office}}</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <div style="text-align:center">
+                    <dir-pagination-controls pagination-id="Committees" boundary-links="true"></dir-pagination-controls>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="Favorites" class="MyBlock" style="height:100%;display:none">
+            <div class="page-content">
+              <div class="container-fluid">
+                <h2>Favorites</h2>
+                <hr width=100% style="border-color:black">
+                <div  style="box-shadow:0 0 3px #000;background-color:white;">
+                  <ul class="nav nav-tabs">
+                    <li role="presentation"><a href="javascript:void(0)" onClick="showFavoriteTab('Legislators')">Legislators</a></li>
+                    <li role="presentation"><a href="javascript:void(0)" onClick="showFavoriteTab('Bills')">Bills</a></li>
+                    <li role="presentation"><a href="javascript:void(0)" onClick="showFavoriteTab('Committees')">Committees</a></li>
+                  </ul>
+                  <div class="FavoriteLegislatorsTab">
+                    <div id="myCarouselFavorite" class="carousel slide" data-interval="false">
+                      <div class="carousel-inner" role="listbox">
+                        <div class="item active">
+                          <div class="panel panel-default PanelNav">
+                            <div class="panel-heading"><span>Favorite Legislators</span> </div>
+                            <div class="table-responsive">
+                              <table class="table">
+                                <tr>
+                                  <th></th>
+                                  <th>Image</th>
+                                  <th>Party</th>
+                                  <th>Name</th>
+                                  <th>Chamber</th>
+                                  <th>State</th>
+                                  <th>Email</th>
+                                </tr>
+                                <tr ng-repeat="x in favoriteListLegislators">
+                                  <td><button ng-click="deleteItem(x,'Legislators')" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> </button></td>
+                                  <td><img style="width:3em;height:3em" src="http://theunitedstates.io/images/congress/225x275/{{x.bioguide_id}}.jpg"></td>
+                                  <td ng-if="x.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png"></td>
+                                  <td ng-if="x.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png"></td>
+                                  <td>{{x.first_name}},{{x.last_name}}</td>
+                                  <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                  <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                  <td>{{x.state_name}}</td>
+                                  <td>{{x.oc_email}}</td>
+                                  <td><button type="button" class="btn btn-primary"  href="#myCarouselFavorite" data-slide="next" ng-click="passValue(x,'showFavoriteLegislators')">View Details</button></td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="item" style="background-color:white">
+                          <div class="panel-heading">
+                            <div class="panel panel-default">
+                              <div class="panel-heading">
+                                <button href="#myCarouselFavorite" data-slide="prev" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Details</button>
+                                <button ng-click="addToFavorite('LegislatorsFavorite')" class="btn btn-default" aria-label="Right Align" style="margin-left:89%"><span ng-class="starType(temp,'Legislators')" ng-style="colorSelect(temp,'Legislators')" aria-hidden="true"></span></button>
+                              </div>
+                              <div class="table-responsive">
+                                <table class="table" style="margin:auto;width:50%;float:left">
+                                  <tr>
+                                    <td rowspan="6"><img src="http://theunitedstates.io/images/congress/225x275/{{temp.bioguide_id}}.jpg"></td>
+                                  </tr>
+                                  <tr>
+                                    <td>{{temp.title}},{{temp.first_name}},{{temp.last_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><a href="mailto:{{temp.oc_email}}">{{temp.oc_email}}</a></td>
+                                  </tr>
+                                  <tr>
+                                    <td>Chamber:{{temp.chamber}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Contact:{{temp.phone}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td ng-if="temp.party=='D'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/democrat.png">Democrat </td>
+                                    <td ng-if="temp.party=='R'"><img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/republican.png">Republican </td>
+                                  </tr>
+                                  <tr>
+                                    <td>Start Term:</td>
+                                    <td>{{tempshowterm_start}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>End Term:</td>
+                                    <td>{{tempshowterm_end}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Term:</td>
+                                    <td><uib-progressbar value="percentage" type="success">{{percentage}}%</uib-progressbar></td>
+                                  </tr>
+                                  <tr>
+                                    <td>Office:</td>
+                                    <td>{{temp.office}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Fax:</td>
+                                    <td>{{temp.fax}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Birthday:</td>
+                                    <td>{{temp.birthday}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Social Links</td>
+                                    <td><a href="http://twitter.com/{{temp.twitter_id}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/twitter.png"></a><a href="http://facebook.com/{{temp.facebook_id}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/facebook.png"></a><a href="{{temp.website}}"> <img height="30em" width="30em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/website.png"></a></td>
+                                  </tr>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="FavoriteBillsTab" style="display:none">
+                    <div id="myCarouselFavoriteBills" class="carousel slide" data-interval="false">
+                      <div class="carousel-inner" role="listbox">
+                        <div class="item active">
+                          <div class="panel panel-default PanelNav">
+                            <div class="panel-heading"><span>Favorite Bills</span> </div>
+                            <div class="table-responsive">
+                              <table class="table">
+                                <tr>
+                                  <th></th>
+                                  <th>Bill ID</th>
+                                  <th>Bill Type</th>
+                                  <th>Title</th>
+                                  <th>Chamber</th>
+                                  <th>Introduced On</th>
+                                  <th>Sponsor</th>
+                                </tr>
+                                <tr ng-repeat="x in favoriteListBills">
+                                  <td><button ng-click="deleteItem(x,'Bills')" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> </button></td>
+                                  <td>{{x.bill_id}}</td>
+                                  <td>{{x.bill_type}}</td>
+                                  <td>{{x.official_title}}</td>
+                                  <td ng-if="x.chamber=='house'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                                  <td ng-if="x.chamber=='senate'"><img style="width:2em;height:2em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                                  <td>{{x.introduced_on}}</td>
+                                  <td>{{x.sponsor.title}}. {{x.sponsor.first_name}}, {{x.sponsor.last_name}}</td>
+                                  <td><button type="button" class="btn btn-primary"  href="#myCarouselFavoriteBills" data-slide="next" ng-click="passValue(x,'showFavoriteBills')">View Details</button></td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="item" style="background-color:white">
+                          <div class="panel-heading">
+                            <div class="panel panel-default">
+                              <div class="panel-heading">
+                                <button href="#myCarouselFavoriteBills" data-slide="prev" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Details</button>
+                                <button ng-click="addToFavorite('BillsFavorite')" class="btn btn-default" aria-label="Right Align" style="margin-left:89%"><span ng-class="starType(tempshowFavoriteBills,'Bills')" ng-style="colorSelect(tempshowFavoriteBills,'Bills')" aria-hidden="true"></span></button>
+                              </div>
+                              <div class="container">
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <div class="table-responsive">
+                                      <table class="table">
+                                        <tr>
+                                          <td><b>Bill ID</b></td>
+                                          <td>{{tempshowFavoriteBills.bill_id}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Title</b></td>
+                                          <td>{{tempshowFavoriteBills.official_title}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Bill Type</b></td>
+                                          <td>{{tempshowFavoriteBills.bill_type}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Sponsor</b></td>
+                                          <td>{{tempshowFavoriteBills.sponsor.title}}. {{tempshowFavoriteBills.sponsor.first_name}}, {{tempshowFavoriteBills.sponsor.last_name}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Chamber</b></td>
+                                          <td>{{tempshowFavoriteBills.chamber}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Status</b></td>
+                                          <td ng-if="tempshowFavoriteBills.active">Active</td>
+                                          <td ng-if="!(tempshowFavoriteBills.active)">New</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Introduced On</b></td>
+                                          <td>{{tempshowFavoriteBills.introduced_on}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Congress URL</b></td>
+                                          <td><a href="{{tempshowFavoriteBills.urls.congress}}">URL</a></td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Version Status</b></td>
+                                          <td>{{tempshowFavoriteBills.last_version.version_name}}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><b>Bill URL</b></td>
+                                          <td><a href="{{tempshowFavoriteBills.last_version.urls.pdf}}">Link</a></td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <object height="500px" width="100%" data="{{tempshowFavoriteBills.last_version.urls.pdf}}">
+                                    </object>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="FavoriteCommitteesTab" style="display:none">
+                    <div class="panel panel-default PanelNav">
+                      <div class="panel-heading"><span>Favorite Bills</span> </div>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <tr>
+                            <th></th>
+                            <th>Chamber</th>
+                            <th>Committee ID</th>
+                            <th>Name</th>
+                            <th>Parent Committee</th>
+                            <th>Contact</th>
+                            <th>Office</th>
+                          </tr>
+                          <tr ng-repeat="x in favoriteListCommittees">
+                            <td><button ng-click="deleteItem(x,'Committees')" type="button" class="btn btn-default" aria-label="Left Align"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> </button></td>
+                            <td ng-if="x.chamber=='house'"><img style="width:5em;height:5em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/house.png">House</td>
+                            <td ng-if="x.chamber=='senate'"><img style="width:5em;height:5em" src="http://ec2-52-55-244-148.compute-1.amazonaws.com/pic/senate.svg">Senate</td>
+                            <td>{{x.committee_id}}</td>
+                            <td>{{x.name}}</td>
+                            <td>{{x.parent_committee_id}}</td>
+                            <td>{{x.phone}}</td>
+                            <td>{{x.office}}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
